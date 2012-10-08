@@ -1,0 +1,44 @@
+ <html>
+    <head>
+      <title>Session Created</title>
+      <script src="/jquery.js" ></script>
+      <script src="/purl.js" ></script>
+      <script>
+      	$(document).ready(function() {
+      		var eventsDiv = $('#events');
+      		var sessionId = $.url().param('sessionId');
+      		var highestId = -1;
+      		
+      		var eventLoop = function() {
+				$.post(
+					'dosession',
+					{
+						sessionId: sessionId,
+						highestId: highestId
+					})
+					.success(function(data) {
+					 	eventsDiv.before('<div>' + data + '</div>');
+					 	
+					 	data = eval(data);
+					 	data.forEach(function(item) {
+					 		if (item.id > highestId)
+					 			highestId = item.id
+					 	});
+					 	
+					 	eventLoop(); })
+					 	 
+    				.error(function(jqXHR, error, errorThrown) {
+    					 eventsDiv.before(error + ': ' + jqXHR.responseText); });
+      		};
+      		
+      		eventLoop();
+      	});
+      </script>
+    </head>
+    <body>
+
+      Session Created
+      <div ></div>
+      <div id="events"></div>
+    </body>
+ </html>
